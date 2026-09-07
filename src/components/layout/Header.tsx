@@ -7,14 +7,45 @@ interface HeaderProps {
   onToggleTheme: () => void
 }
 
+interface NavLinkProps {
+  to: string
+  path: string
+  children: ReactNode
+  onNavigate: (path: string) => void
+}
+
+function NavLink({ to, path, children, onNavigate }: NavLinkProps) {
+  const active = to === '/' ? path === '/' : path === to || path.startsWith(`${to}/`)
+
+  return (
+    <a
+      href={to}
+      className={active ? 'nav-link active' : 'nav-link'}
+      aria-current={active ? 'page' : undefined}
+      onClick={(event) => {
+        event.preventDefault()
+        onNavigate(to)
+      }}
+    >
+      {children}
+    </a>
+  )
+}
+
 export function Header({ path, dark, onNavigate, onToggleTheme }: HeaderProps) {
-  const Link = ({ to, children }: { to: string; children: ReactNode }) => {
-    const active = to === '/' ? path === '/' : path === to || path.startsWith(`${to}/`)
-    return <a href={to} className={active ? 'nav-link active' : 'nav-link'} aria-current={active ? 'page' : undefined} onClick={(event) => { event.preventDefault(); onNavigate(to) }}>{children}</a>
-  }
-  return <header className="site-header">
-    <a className="brand" href="/" onClick={(event) => { event.preventDefault(); onNavigate('/') }}>MB<span>.</span></a>
-    <nav aria-label="Navigation principale"><Link to="/">Accueil</Link><Link to="/about">À propos</Link><Link to="/projects">Projets</Link><Link to="/contact">Contact</Link></nav>
-    <div className="header-actions"><Link to="/builder">Builder</Link><button className="theme-toggle" onClick={onToggleTheme} aria-label={dark ? 'Activer le thème clair' : 'Activer le thème sombre'}>{dark ? '☼' : '☾'}</button></div>
-  </header>
+  return (
+    <header className="site-header">
+      <a className="brand" href="/" onClick={(event) => { event.preventDefault(); onNavigate('/') }}>MB<span>.</span></a>
+      <nav aria-label="Navigation principale">
+        <NavLink to="/" path={path} onNavigate={onNavigate}>Accueil</NavLink>
+        <NavLink to="/about" path={path} onNavigate={onNavigate}>À propos</NavLink>
+        <NavLink to="/projects" path={path} onNavigate={onNavigate}>Projets</NavLink>
+        <NavLink to="/contact" path={path} onNavigate={onNavigate}>Contact</NavLink>
+      </nav>
+      <div className="header-actions">
+        <NavLink to="/builder" path={path} onNavigate={onNavigate}>Builder</NavLink>
+        <button className="theme-toggle" onClick={onToggleTheme} aria-label={dark ? 'Activer le thème clair' : 'Activer le thème sombre'}>{dark ? '☼' : '☾'}</button>
+      </div>
+    </header>
+  )
 }

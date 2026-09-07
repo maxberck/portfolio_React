@@ -1,75 +1,38 @@
-# React + TypeScript + Vite
+# Portfolio React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Portfolio personnel moderne construit avec React, TypeScript et Vite.
 
-Currently, two official plugins are available:
+## Philosophie
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Le projet est volontairement **frontend-only** : aucune inscription visiteur, aucun backend et aucune base de données. Les contenus du portfolio sont pilotés par des fichiers JSON typés.
 
-## React Compiler
+## Documentation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `PRODUCT.md` — vision, fonctionnalités et périmètre
+- `ARCHITECTURE.md` — architecture technique
+- `ACCEPTANCE.md` — critères d'acceptation
+- `AGENTS.md` — règles pour les agents de développement
+- `START_CODEX.md` — procédure de démarrage pour Codex
 
-## Expanding the ESLint configuration
+## Démarrage prévu
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Build de production :
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run build
 ```
+
+## Builder
+
+Le Builder permet au propriétaire de répondre à un questionnaire étape par étape pour créer ou modifier des contenus. Il génère ensuite le JSON à intégrer au projet.
+
+Un frontend déployé ne peut pas écrire directement dans le dépôt GitHub : le flux attendu est questionnaire → preview → export JSON → intégration → commit/push → déploiement.
+
+## Déploiement
+
+Le site peut être déployé comme application statique, notamment sur Vercel.

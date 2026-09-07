@@ -1,43 +1,35 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
+import { Header } from './components/layout/Header'
+import { Footer } from './components/layout/Footer'
+import { useRouter } from './hooks/useRouter'
 import { portfolioData, getProjectById } from './services/portfolioData'
-import type { Project } from './types/portfolio'
-
-const routes = ['/', '/about', '/projects', '/contact', '/builder']
-const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')) }
-const slugify = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+import { Home } from './pages/Home'
+import { About } from './pages/About'
+import { Projects } from './pages/Projects'
+import { ProjectDetails } from './pages/ProjectDetails'
+import { Contact } from './pages/Contact'
+import { Builder } from './pages/Builder'
 
 function App() {
-  const [path, setPath] = useState(window.location.pathname)
+  const { path, navigate } = useRouter()
   const [dark, setDark] = useState(() => localStorage.getItem('portfolio-theme') !== 'light')
-  const [filter, setFilter] = useState('all')
-  useEffect(() => { const onPop = () => setPath(window.location.pathname); addEventListener('popstate', onPop); return () => removeEventListener('popstate', onPop) }, [])
-  useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light'; localStorage.setItem('portfolio-theme', dark ? 'dark' : 'light') }, [dark])
-  const techs = useMemo(() => Array.from(new Set(portfolioData.projects.flatMap(p => p.technologies))), [])
-  const projects = portfolioData.projects.filter(p => filter === 'all' || p.technologies.includes(filter))
-  const Link = ({ to, children }: { to: string; children: ReactNode }) => <a href={to} className={path === to ? 'nav-link active' : 'nav-link'} onClick={e => { e.preventDefault(); go(to) }}>{children}</a>
-  const Card = ({ p }: { p: Project }) => <article className="project-card"><button className="project-hit" onClick={() => go(`/projects/${p.id}`)} aria-label={`Voir le projet ${p.title}`}><div className="project-image" style={{ backgroundImage: `url(${p.image})` }} /><div className="project-body"><small>{p.year}{p.featured ? ' · FEATURED' : ''}</small><h3>{p.title}</h3><p>{p.description}</p><div className="tags">{p.technologies.map(t => <span key={t}>{t}</span>)}</div></div></button><div className="project-links">{p.githubUrl && <a href={p.githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}{p.demoUrl && <a href={p.demoUrl} target="_blank" rel="noreferrer">Demo ↗</a>}</div></article>
 
-  const Home = () => <main><section className="hero-section container"><div><span className="eyebrow">PORTFOLIO / 2026</span><h1>Je transforme des idées en <em>expériences web.</em></h1><p className="hero-lead">{portfolioData.profile.bio}</p><div className="actions"><Link to="/projects">Voir mes projets</Link><Link to="/contact">Me contacter</Link></div></div><div className="hero-card"><div className="hero-avatar">{portfolioData.profile.firstName[0]}{portfolioData.profile.lastName[0]}</div><strong>{portfolioData.profile.firstName} {portfolioData.profile.lastName}</strong><span>{portfolioData.profile.title}</span><i>● Disponible</i></div></section><section className="section container"><span className="eyebrow">01 / SÉLECTION</span><h2>Quelques projets.</h2><div className="project-grid">{projects.map(p => <Card key={p.id} p={p} />)}</div></section><section className="section container split"><div><span className="eyebrow">02 / STACK</span><h2>Construire vite, sans sacrifier la qualité.</h2></div><div>{portfolioData.skills.map(s => <div className="skill-row" key={s.id}><b>{s.name}</b><span>{s.level}</span></div>)}</div></section></main>
+  useEffect(() => {
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+    localStorage.setItem('portfolio-theme', dark ? 'dark' : 'light')
+  }, [dark])
 
-  const About = () => <main className="container page"><span className="eyebrow">À PROPOS</span><h1>Développeur <em>curieux</em>, orienté produit.</h1><p className="wide-copy">{portfolioData.profile.bio} Je privilégie les interfaces claires, les architectures simples et les détails qui rendent une expérience mémorable.</p><div className="stats"><div><b>{portfolioData.projects.length}</b><span>Projets</span></div><div><b>{portfolioData.skills.length}</b><span>Compétences</span></div><div><b>{portfolioData.experiences.length}</b><span>Expériences</span></div></div><section className="detail-section"><span className="eyebrow">EXPÉRIENCE</span>{portfolioData.experiences.length ? portfolioData.experiences.map(e => <article className="timeline-item" key={e.id}><small>{e.startDate} — {e.endDate || 'Aujourd’hui'}</small><h2>{e.title}</h2><strong>{e.company}</strong><p>{e.description}</p></article>) : <p className="empty">Les expériences seront ajoutées via le Builder.</p>}</section><section className="detail-section"><span className="eyebrow">CERTIFICATIONS</span>{portfolioData.certifications.length ? portfolioData.certifications.map(c => <article className="timeline-item" key={c.name}><small>{c.date}</small><h2>{c.name}</h2><strong>{c.issuer}</strong><p>{c.description}</p></article>) : <p className="empty">Les certifications seront ajoutées via le Builder.</p>}</section></main>
-
-  const Projects = () => <main className="container page"><span className="eyebrow">PROJETS</span><h1>Ce que je <em>construis.</em></h1><div className="filters"><button className={filter === 'all' ? 'selected' : ''} onClick={() => setFilter('all')}>Tous</button>{techs.map(t => <button className={filter === t ? 'selected' : ''} onClick={() => setFilter(t)} key={t}>{t}</button>)}</div><div className="project-grid">{projects.map(p => <Card key={p.id} p={p} />)}</div>{!projects.length && <p className="empty">Aucun projet pour cette technologie.</p>}</main>
-
-  const ProjectDetails = ({ id }: { id: string }) => { const project = getProjectById(id); if (!project) return <main className="container page"><span className="eyebrow">PROJET</span><h1>Projet <em>introuvable.</em></h1><Link to="/projects">Retour aux projets</Link></main>; return <main className="container page"><Link to="/projects">← Tous les projets</Link><span className="eyebrow detail-label">PROJET / {project.year}</span><h1>{project.title}</h1><p className="wide-copy">{project.description}</p><div className="detail-visual" style={{ backgroundImage: `url(${project.image})` }} /><div className="project-detail-grid"><div><span className="eyebrow">TECHNOLOGIES</span><div className="tags">{project.technologies.map(t => <span key={t}>{t}</span>)}</div></div><div className="project-detail-actions">{project.githubUrl && <a href={project.githubUrl} target="_blank" rel="noreferrer">Voir le code ↗</a>}{project.demoUrl && <a href={project.demoUrl} target="_blank" rel="noreferrer">Voir la démo ↗</a>}</div></div></main> }
-
-  const Contact = () => <main className="container page"><span className="eyebrow">CONTACT</span><h1>Construisons quelque <em>chose.</em></h1><p className="wide-copy">Pour une collaboration, un projet ou simplement échanger, écrivez-moi directement.</p><a className="email-card" href={`mailto:${portfolioData.profile.email}`}>{portfolioData.profile.email}<span>↗</span></a></main>
-
-  const Builder = () => { const questions = ['Quel est le nom de la compétence ?','Quel est ton niveau ?','Depuis combien de temps ?','Comment l’utilises-tu ?','Sur quels projets ?']; const [step, setStep] = useState(() => Number(localStorage.getItem('builder-step') || 0)); const [answers, setAnswers] = useState<string[]>(() => JSON.parse(localStorage.getItem('builder-answers') || '[]')); const [value, setValue] = useState(() => answers[step] || ''); const update = (next: string, index = step) => { const copy = [...answers]; copy[index] = next; setAnswers(copy); localStorage.setItem('builder-answers', JSON.stringify(copy)) }; const next = () => { update(value); if (step < questions.length - 1) { const nextStep = step + 1; setStep(nextStep); localStorage.setItem('builder-step', String(nextStep)); setValue(answers[nextStep] || '') } else { localStorage.setItem('builder-step', String(step)) } }; const json = { skills: [{ id: slugify(answers[0] || value), name: answers[0] || value, level: answers[1] || '', ...(answers[2] ? { years: Number(answers[2]) } : {}), description: answers[3] || '', projects: (answers[4] || '').split(',').map(x => x.trim()).filter(Boolean) }] }; const reset = () => { setStep(0); setValue(''); setAnswers([]); localStorage.removeItem('builder-step'); localStorage.removeItem('builder-answers') }; const copy = () => navigator.clipboard?.writeText(JSON.stringify(json, null, 2)); return <main className="container page builder"><span className="eyebrow">BUILDER / PROPRIÉTAIRE</span><h1>Construis ton contenu <em>en répondant.</em></h1><p className="wide-copy">Ce Builder prépare le JSON à intégrer dans le projet. Il ne nécessite aucun compte ni backend.</p><div className="builder-grid"><section className="builder-card"><div className="progress"><span style={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div><small>QUESTION {step + 1} / {questions.length}</small><h2>{questions[step]}</h2><input autoFocus value={value} onChange={e => { setValue(e.target.value); update(e.target.value) }} placeholder="Ta réponse…" onKeyDown={e => e.key === 'Enter' && next()} /><div className="builder-actions"><button disabled={step === 0} onClick={() => { const previous = step - 1; setStep(previous); setValue(answers[previous] || '') }}>Retour</button><button className="primary" onClick={next}>{step === questions.length - 1 ? 'Terminer' : 'Continuer →'}</button></div><button onClick={reset}>Réinitialiser</button></section><aside className="preview-card"><small>APERÇU JSON</small><pre>{JSON.stringify(json, null, 2)}</pre><button onClick={copy}>Copier le JSON</button></aside></div></main> }
-
-  let content: ReactNode
-  if (path === '/') content = <Home />
-  else if (path === '/about') content = <About />
-  else if (path === '/projects') content = <Projects />
-  else if (path.startsWith('/projects/')) content = <ProjectDetails id={path.split('/')[2] || ''} />
-  else if (path === '/contact') content = <Contact />
+  let content
+  if (path === '/') content = <Home profile={portfolioData.profile} projects={portfolioData.projects} skills={portfolioData.skills} testimonials={portfolioData.testimonials} onNavigate={navigate} />
+  else if (path === '/about') content = <About profile={portfolioData.profile} projectCount={portfolioData.projects.length} skillCount={portfolioData.skills.length} experiences={portfolioData.experiences} certifications={portfolioData.certifications} testimonials={portfolioData.testimonials} />
+  else if (path === '/projects') content = <Projects projects={portfolioData.projects} onNavigate={navigate} />
+  else if (path.startsWith('/projects/')) content = <ProjectDetails project={getProjectById(path.split('/')[2] || '')} onNavigate={navigate} />
+  else if (path === '/contact') content = <Contact profile={portfolioData.profile} />
   else if (path === '/builder') content = <Builder />
-  else content = <main className="container page"><h1>404</h1><p>Cette page n’existe pas.</p><Link to="/">Retour à l’accueil</Link></main>
-  return <div className="app"><header className="site-header"><a className="brand" href="/" onClick={e => { e.preventDefault(); go('/') }}>MB<span>.</span></a><nav aria-label="Navigation principale">{routes.slice(0, 4).map(r => <Link key={r} to={r}>{r === '/' ? 'Accueil' : r.slice(1).replace(/\b\w/g, c => c.toUpperCase())}</Link>)}</nav><div className="header-actions"><Link to="/builder">Builder</Link><button className="theme-toggle" onClick={() => setDark(v => !v)} aria-label="Changer le thème">{dark ? '☼' : '☾'}</button></div></header>{content}<footer className="footer container"><span>© 2026 {portfolioData.profile.firstName} {portfolioData.profile.lastName}</span>{portfolioData.profile.socialLinks?.github && <a href={portfolioData.profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub ↗</a>}</footer></div>
+  else content = <main className="container page"><span className="eyebrow">404</span><h1>Cette page <em>n’existe pas.</em></h1><button className="primary" onClick={() => navigate('/')}>Retour à l’accueil</button></main>
+
+  return <div className="app"><Header path={path} dark={dark} onNavigate={navigate} onToggleTheme={() => setDark((value) => !value)} />{content}<Footer profile={portfolioData.profile} /></div>
 }
+
 export default App

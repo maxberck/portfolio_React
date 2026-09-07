@@ -1,0 +1,13 @@
+{
+  "firstName": "Maxence",
+  "lastName": "Berck",
+  "title": "Développeur Full Stack",
+  "bio": "Je conçois des expériences web modernes, performantes et soignées.",
+  "photo": "/images/profile.jpg",
+  "email": "contact@example.com",
+  "cvUrl": "/cv.pdf",
+  "location": "Belgique",
+  "socialLinks": {
+    "github": "https://github.com/maxberck"
+  }
+}

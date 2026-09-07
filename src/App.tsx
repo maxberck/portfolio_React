@@ -1,122 +1,27 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import './App.css'
+import { portfolioData } from './services/portfolioData'
+import type { Project } from './types/portfolio'
+
+const routes = ['/', '/about', '/projects', '/contact', '/builder']
+const go = (path: string) => { window.history.pushState({}, '', path); window.dispatchEvent(new PopStateEvent('popstate')) }
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+  const [path, setPath] = useState(window.location.pathname)
+  const [dark, setDark] = useState(true)
+  const [filter, setFilter] = useState('all')
+  useEffect(() => { const onPop = () => setPath(window.location.pathname); addEventListener('popstate', onPop); return () => removeEventListener('popstate', onPop) }, [])
+  useEffect(() => { document.documentElement.dataset.theme = dark ? 'dark' : 'light' }, [dark])
+  const techs = useMemo(() => Array.from(new Set(portfolioData.projects.flatMap(p => p.technologies))), [])
+  const projects = portfolioData.projects.filter(p => filter === 'all' || p.technologies.includes(filter))
+  const Link = ({ to, children }: { to: string; children: ReactNode }) => <a href={to} className={path === to ? 'nav-link active' : 'nav-link'} onClick={e => { e.preventDefault(); go(to) }}>{children}</a>
+  const Card = ({ p }: { p: Project }) => <article className="project-card"><div className="project-image" style={{ backgroundImage: `url(${p.image})` }} /><div className="project-body"><small>{p.year}{p.featured ? ' · FEATURED' : ''}</small><h3>{p.title}</h3><p>{p.description}</p><div className="tags">{p.technologies.map(t => <span key={t}>{t}</span>)}</div><div className="project-links">{p.githubUrl && <a href={p.githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}{p.demoUrl && <a href={p.demoUrl} target="_blank" rel="noreferrer">Demo ↗</a>}</div></div></article>
+  const Home = () => <main><section className="hero-section container"><div><span className="eyebrow">PORTFOLIO / 2026</span><h1>Je transforme des idées en <em>expériences web.</em></h1><p className="hero-lead">{portfolioData.profile.bio}</p><div className="actions"><Link to="/projects">Voir mes projets</Link><Link to="/contact">Me contacter</Link></div></div><div className="hero-card"><div className="hero-avatar">{portfolioData.profile.firstName[0]}{portfolioData.profile.lastName[0]}</div><strong>{portfolioData.profile.firstName} {portfolioData.profile.lastName}</strong><span>{portfolioData.profile.title}</span><i>● Disponible</i></div></section><section className="section container"><span className="eyebrow">01 / SÉLECTION</span><h2>Quelques projets.</h2><div className="project-grid">{projects.map(p => <Card key={p.id} p={p} />)}</div></section><section className="section container split"><div><span className="eyebrow">02 / STACK</span><h2>Construire vite, sans sacrifier la qualité.</h2></div><div>{portfolioData.skills.map(s => <div className="skill-row" key={s.id}><b>{s.name}</b><span>{s.level}</span></div>)}</div></section></main>
+  const About = () => <main className="container page"><span className="eyebrow">À PROPOS</span><h1>Développeur <em>curieux</em>, orienté produit.</h1><p className="wide-copy">{portfolioData.profile.bio} Je privilégie les interfaces claires, les architectures simples et les détails qui rendent une expérience mémorable.</p><div className="stats"><div><b>{portfolioData.projects.length}</b><span>Projets</span></div><div><b>{portfolioData.skills.length}</b><span>Compétences</span></div><div><b>{portfolioData.experiences.length}</b><span>Expériences</span></div></div></main>
+  const Projects = () => <main className="container page"><span className="eyebrow">PROJETS</span><h1>Ce que je <em>construis.</em></h1><div className="filters"><button className={filter === 'all' ? 'selected' : ''} onClick={() => setFilter('all')}>Tous</button>{techs.map(t => <button className={filter === t ? 'selected' : ''} onClick={() => setFilter(t)} key={t}>{t}</button>)}</div><div className="project-grid">{projects.map(p => <Card key={p.id} p={p} />)}</div></main>
+  const Contact = () => <main className="container page"><span className="eyebrow">CONTACT</span><h1>Construisons quelque <em>chose.</em></h1><p className="wide-copy">Pour une collaboration, un projet ou simplement échanger, écrivez-moi directement.</p><a className="email-card" href={`mailto:${portfolioData.profile.email}`}>{portfolioData.profile.email}<span>↗</span></a></main>
+  const Builder = () => { const [step, setStep] = useState(0); const [value, setValue] = useState(''); const [answers, setAnswers] = useState<string[]>([]); const qs = ['Quel est le nom de la compétence ?','Quel est ton niveau ?','Depuis combien de temps ?','Comment l’utilises-tu ?','Sur quels projets ?']; const next = () => { const a = [...answers]; a[step] = value; setAnswers(a); setValue(''); setStep(Math.min(step + 1, qs.length - 1)) }; const json = { skills: [{ id: (answers[0] || '').toLowerCase().replace(/[^a-z0-9]+/g, '-'), name: answers[0] || '', level: answers[1] || '', years: answers[2] ? Number(answers[2]) : undefined, description: answers[3] || '', projects: (answers[4] || '').split(',').map(x => x.trim()).filter(Boolean) }] }; return <main className="container page builder"><span className="eyebrow">BUILDER / PROPRIÉTAIRE</span><h1>Construis ton contenu <em>en répondant.</em></h1><div className="builder-grid"><section className="builder-card"><div className="progress"><span style={{ width: `${((step + 1) / qs.length) * 100}%` }} /></div><small>QUESTION {step + 1} / {qs.length}</small><h2>{qs[step]}</h2><input autoFocus value={value} onChange={e => setValue(e.target.value)} placeholder="Ta réponse…" onKeyDown={e => e.key === 'Enter' && next()} /><button className="primary" onClick={next}>{step === qs.length - 1 ? 'Terminer' : 'Continuer →'}</button></section><aside className="preview-card"><small>APERÇU JSON</small><pre>{JSON.stringify(json, null, 2)}</pre><button onClick={() => navigator.clipboard?.writeText(JSON.stringify(json, null, 2))}>Copier le JSON</button></aside></div></main> }
+  let content: ReactNode = path === '/' ? <Home /> : path === '/about' ? <About /> : path === '/projects' ? <Projects /> : path === '/contact' ? <Contact /> : path === '/builder' ? <Builder /> : <main className="container page"><h1>404</h1><Link to="/">Retour à l’accueil</Link></main>
+  return <div className="app"><header className="site-header"><a className="brand" href="/" onClick={e => { e.preventDefault(); go('/') }}>MB<span>.</span></a><nav>{routes.slice(0, 4).map(r => <Link key={r} to={r}>{r === '/' ? 'Accueil' : r.slice(1).replace(/\b\w/g, c => c.toUpperCase())}</Link>)}</nav><div className="header-actions"><Link to="/builder">Builder</Link><button className="theme-toggle" onClick={() => setDark(v => !v)}>{dark ? '☼' : '☾'}</button></div></header>{content}<footer className="footer container"><span>© 2026 {portfolioData.profile.firstName} {portfolioData.profile.lastName}</span>{portfolioData.profile.socialLinks?.github && <a href={portfolioData.profile.socialLinks.github} target="_blank" rel="noreferrer">GitHub ↗</a>}</footer></div>
 }
-
 export default App

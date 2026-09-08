@@ -25,10 +25,9 @@ export function Home({ profile, projects, skills, testimonials, onNavigate }: Ho
       </div>
     </section>
 
-    <section className="section container work-section" style={{ position: 'relative', isolation: 'isolate' }}>
-      <div aria-hidden="true" style={{ position: 'absolute', inset: 0, zIndex: -1, pointerEvents: 'none', opacity: 0.9, backgroundImage: `radial-gradient(circle, color-mix(in srgb, var(--border) 13%, transparent) 0 6px, transparent 7px), radial-gradient(circle, color-mix(in srgb, var(--border) 7%, transparent) 0 4px, transparent 5px), radial-gradient(circle, color-mix(in srgb, var(--accent) 10%, transparent) 0 5px, transparent 6px), radial-gradient(circle, color-mix(in srgb, var(--border) 18%, transparent) 0 3px, transparent 4px)`, backgroundSize: '118px 118px, 173px 173px, 211px 211px, 137px 137px', backgroundPosition: '8px 12px, 57px 91px, 133px 38px, 24px 149px' }} />
+    <section className="section container work-section">
       <div className="section-heading"><span className="section-number">01</span><div><span className="eyebrow">SELECTED WORK</span><h2>Projets récents</h2></div><span className="section-count">{String(projects.length).padStart(2, '0')} projets</span></div>
-      <div className="project-grid">{projects.map((project) => <ProjectCard key={project.id} project={project} onOpen={(id) => onNavigate(`/projects/${id}`)} />)}</div>{!projects.length && <p className="empty">Les projets arrivent bientôt.</p>}
+      <div className="project-grid comic-grid">{projects.map((project) => <ProjectCard key={project.id} project={project} onOpen={(id) => onNavigate(`/projects/${id}`)} />)}</div>{!projects.length && <p className="empty">Les projets arrivent bientôt.</p>}
     </section>
 
     <section className="section container about-strip">

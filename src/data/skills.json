@@ -1,8 +1,15 @@
 {
   "skills": [
-    {"id":"react","name":"React","level":"Expert","years":3,"description":"Interfaces web modernes et composants réutilisables.","projects":["portfolio"]},
-    {"id":"typescript","name":"TypeScript","level":"Advanced","years":3,"description":"Applications robustes et fortement typées.","projects":["portfolio"]},
-    {"id":"vite","name":"Vite","level":"Advanced","years":2,"description":"Tooling frontend rapide et moderne.","projects":["portfolio"]},
-    {"id":"tailwind","name":"Tailwind CSS","level":"Advanced","years":2,"description":"Design responsive et interfaces cohérentes.","projects":["portfolio"]}
+    {
+      "id": "html",
+      "name": "HTML",
+      "level": "Avancé",
+      "years": 8,
+      "description": "Application Web et projet personnel ",
+      "projects": [
+        "Des jeux",
+        "des sites clients et des exercices"
+      ]
+    }
   ]
 }

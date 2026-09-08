@@ -1,14 +1,16 @@
 {
   "projects": [
     {
-      "id":"portfolio",
-      "title":"Portfolio personnel",
-      "description":"Portfolio développeur moderne construit avec React, TypeScript et Vite.",
-      "image":"/images/project-portfolio.jpg",
-      "technologies":["React","TypeScript","Vite","Tailwind CSS"],
-      "year":2026,
-      "githubUrl":"https://github.com/maxberck/portfolio_React",
-      "featured":true
+      "id": "pixeltroll",
+      "title": "Pixeltroll",
+      "description": "Une application où l'on doit trouver un pixel sur une page",
+      "image": "",
+      "technologies": [
+        "React",
+        "TypeScript"
+      ],
+      "year": 2026,
+      "demoUrl": "https://pixeltroll.org"
     }
   ]
 }

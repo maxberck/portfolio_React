@@ -1,7 +1,10 @@
 import type { Project } from '../../types/portfolio'
+import './ProjectCard.css'
 
 export function ProjectCard({ project, onOpen }: { project: Project; onOpen: (id: string) => void }) {
-  return <article className="project-card">
+  return <article className="project-card comic-panel">
+    <span className="comic-panel-number" aria-hidden="true">{String(project.year).slice(-2)}</span>
+    <span className="comic-panel-caption" aria-hidden="true">CASE / {project.id.toUpperCase()}</span>
     <button className="project-hit" onClick={() => onOpen(project.id)} aria-label={`Voir le projet ${project.title}`}>
       <div className="project-image" style={{ backgroundImage: project.image ? `url(${project.image})` : undefined }} aria-hidden="true" />
       <div className="project-body"><small>{project.year}{project.featured ? ' · FEATURED' : ''}</small><h3>{project.title}</h3><p>{project.description}</p><div className="tags">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></div>

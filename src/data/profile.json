@@ -1,13 +1,13 @@
 {
   "firstName": "Maxence",
-  "lastName": "Berck",
-  "title": "Développeur Full Stack",
-  "bio": "Je conçois des expériences web modernes, performantes et soignées.",
-  "photo": "/images/profile.jpg",
-  "email": "contact@example.com",
-  "cvUrl": "/cv.pdf",
-  "location": "Belgique",
+  "lastName": "Berckmans",
+  "title": "Développer Web ",
+  "bio": "Je suis passionnée par l'informatique depuis un bon moment. J'aime créer des projets et apprendre toujours plus sur les outils informatique. ",
+  "photo": "",
+  "email": "maxence@ipn.be",
+  "cvUrl": "",
+  "location": "",
   "socialLinks": {
-    "github": "https://github.com/maxberck"
+    "github": ""
   }
 }
